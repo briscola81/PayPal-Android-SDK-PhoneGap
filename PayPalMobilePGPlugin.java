@@ -92,9 +92,10 @@ public class PayPalMobilePGPlugin extends CordovaPlugin {
 	}
 
 	private void presentPaymentUI(JSONArray args) throws JSONException {
-		if (args.length() != 4) {
+		if (args.length() < 4) {
 			this.callbackContext
-					.error("presentPaymentUI requires precisely four arguments");
+					.error("presentPaymentUI requires at least the first four arguments of the following: " +
+							"clientId, email, payerId, payment, hideCreditCardButton.");
 			return;
 		}
 
@@ -102,6 +103,7 @@ public class PayPalMobilePGPlugin extends CordovaPlugin {
 		String email = args.getString(1);
 		String payerId = args.getString(2);
 		JSONObject paymentObject = args.getJSONObject(3);
+		Boolean hideCreditCardButton = args.length() > 4 ? args.getBoolean(4) : false;
 
 		String amount = paymentObject.getString("amount");
 		String currency = paymentObject.getString("currency");
@@ -118,6 +120,8 @@ public class PayPalMobilePGPlugin extends CordovaPlugin {
 
 		intent.putExtra(PaymentActivity.EXTRA_PAYER_ID, payerId);
 		intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payment);
+		intent.putExtra(PaymentActivity.EXTRA_SKIP_CREDIT_CARD, hideCreditCardButton);
+		
 		this.cordova.startActivityForResult(this, intent, 0);
 	}
 	
